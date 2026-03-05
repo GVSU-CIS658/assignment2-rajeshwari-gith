@@ -1,4 +1,4 @@
-
+import "./style.scss";
 
 const bases: Record<string, string> = {
   blackTea: "#8B4513",
