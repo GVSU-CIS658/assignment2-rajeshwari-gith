@@ -1,224 +1,103 @@
-/* =========================
-   Pouring layers
-   ========================= */
+import "./style.scss";
 
-@keyframes pour-layer {
-  0% {
-    transform: translateY(400%);
+const bases: Record<string, string> = {
+  blackTea: "#8B4513",
+  greenTea: "#C8E6C9",
+  coffee: "#6F4E37",
+};
+
+const creamers: Record<string, string> = {
+  milk: "AliceBlue",
+  cream: "#F5F5DC",
+  half: "#FFFACD",
+};
+
+const syrups: Record<string, string> = {
+  vanilla: "#FFEFD5",
+  caramel: "#DAA520",
+  hazelnut: "#6B4423",
+};
+
+function applyTemperature(input: HTMLInputElement): void {
+  const container = document.getElementById("condensation") as HTMLDivElement | null;
+  if (!container) return;
+
+  const children = container.children;
+
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i] as HTMLElement;
+
+    if (input.value === "hot") {
+      child.className = "stream";
+    } else {
+      child.className = "flake";
+    }
   }
-  100% {
-    transform: translateY(0%);
+}
+
+function applyBase(input: HTMLInputElement): void {
+  const baseElements = document.getElementsByClassName("base");
+  if (baseElements.length === 0) return;
+
+  const baseDiv = baseElements[0] as HTMLDivElement;
+  const color = bases[input.value];
+  if (!color) return;
+
+  baseDiv.style.backgroundColor = color;
+}
+
+function applyCream(input: HTMLInputElement): void {
+  const creamElements = document.getElementsByClassName("foam");
+  if (creamElements.length === 0) return;
+
+  const color = creamers[input.value];
+  if (!color) return;
+
+  for (let i = 0; i < creamElements.length; i++) {
+    const element = creamElements[i] as HTMLDivElement;
+    element.style.backgroundColor = color;
   }
 }
 
-.base {
-  position: relative;
-  background-color: #361713;
-  width: 100%;
-  height: 50%;
-  bottom: 0;
-  animation: pour-layer 2s forwards;
-  z-index: 300;
+function applySyrup(input: HTMLInputElement): void {
+  const syrupElements = document.getElementsByClassName("syrup");
+  if (syrupElements.length === 0) return;
+
+  const syrupDiv = syrupElements[0] as HTMLDivElement;
+  const color = syrups[input.value];
+  if (!color) return;
+
+  syrupDiv.style.setProperty("--syrup-color", color);
 }
 
-// TODO:
-// 1. Create a mixin named `syrup-layer`.
-// 2. The mixin should take one parameter: $color.
-// 3. Replace the hard-coded color (#ffefd5) in the gradient with $color.
-// 4. Use @include syrup-layer(...) inside .syrup.
-
-@mixin syrup-layer($color) {
-  background: repeating-linear-gradient(
-    45deg,
-    white,
-    white 10px,
-    $color 10px,
-    $color 20px
-  );
+function setupSyrupListeners(): void {
+  const inputs = document.querySelectorAll<HTMLInputElement>('input[name="syrup"]');
+  inputs.forEach((input) => {
+    input.addEventListener("change", () => applySyrup(input));
+  });
 }
+setupSyrupListeners();
 
-.syrup {
-  position: relative;
-  transform: translateY(400%);
-  @include syrup-layer(#ffefd5);
-  width: 100%;
-  height: 20%;
-  animation: pour-layer 2s 1s forwards;
-  z-index: 2;
+function setupCreamListeners(): void {
+  const inputs = document.querySelectorAll<HTMLInputElement>('input[name="cream"]');
+  inputs.forEach((input) => {
+    input.addEventListener("change", () => applyCream(input));
+  });
 }
+setupCreamListeners();
 
-.froth {
-  overflow: visible;
-  position: relative;
-  transform: translateY(400%);
-  height: 30%;
-  width: 100%;
-  background-color: #c6c6c6;
-  animation: pour-layer 2s 2s forwards;
+function setupTemperatureListeners(): void {
+  const inputs = document.querySelectorAll<HTMLInputElement>('input[name="temperature"]');
+  inputs.forEach((input) => {
+    input.addEventListener("change", () => applyTemperature(input));
+  });
 }
+setupTemperatureListeners();
 
-/* =========================
-   Foam bubbles
-   ========================= */
-
-.foam {
-  display: block;
-  background: #e4e0d2;
-  border-radius: 30px;
-  height: 40px;
-  width: 40px;
-  position: absolute;
+function setupBaseListeners(): void {
+  const inputs = document.querySelectorAll<HTMLInputElement>('input[name="base"]');
+  inputs.forEach((input) => {
+    input.addEventListener("change", () => applyBase(input));
+  });
 }
-
-.foam:nth-child(1) {
-  top: 0px;
-  left: -3px;
-}
-
-.foam:nth-child(2) {
-  top: 0px;
-  left: 55px;
-}
-
-.foam:nth-child(3) {
-  width: 30px;
-  height: 30px;
-  border-radius: 40px;
-  top: 3px;
-  left: 30px;
-}
-
-.foam:nth-child(4) {
-  width: 30px;
-  height: 30px;
-  border-radius: 45px;
-  top: 5px;
-  right: -2px;
-}
-
-.foam:nth-child(5) {
-  top: 2px;
-  right: 10px;
-}
-
-/* =========================
-   Mug / carafe
-   ========================= */
-
-.mug {
-  width: 8em;
-  height: 6em;
-  border-radius: 0.05em 0.05em 3em 3em;
-  border: 10px solid #c6c6c6;
-  position: relative;
-  margin: 0 auto 5em auto;
-}
-
-.mug:after {
-  content: "";
-  position: absolute;
-  width: 20px;
-  height: 2em;
-  right: 0;
-  margin-right: -2.5em;
-  top: 1em;
-  border-radius: 0.05em 3em 3em 0.5em;
-  border: 10px solid #c6c6c6;
-}
-
-.carafe {
-  overflow: hidden;
-  border-radius: 0.05em 0.05em 2.2em 2.2em;
-  background: #c6c6c6;
-  width: 100%;
-  height: 100%;
-  transition: all 1s;
-}
-
-/* =========================
-   Steam animations (plain CSS)
-   ========================= */
-
-@keyframes move-and-fade-10 {
-  0% { opacity: 0; transform: translateY(0) rotate(90deg); }
-  50% { opacity: 0.5; }
-  75% { opacity: 0; }
-  100% { transform: translateY(-10px) rotate(90deg); opacity: 0; }
-}
-
-@keyframes move-and-fade-15 {
-  0% { opacity: 0; transform: translateY(0) rotate(90deg); }
-  50% { opacity: 0.5; }
-  75% { opacity: 0; }
-  100% { transform: translateY(-15px) rotate(90deg); opacity: 0; }
-}
-
-@keyframes move-and-fade-20 {
-  0% { opacity: 0; transform: translateY(0) rotate(90deg); }
-  50% { opacity: 0.5; }
-  75% { opacity: 0; }
-  100% { transform: translateY(-20px) rotate(90deg); opacity: 0; }
-}
-
-.stream {
-  position: absolute;
-  transform: rotate(90deg);
-  height: 80px;
-  width: 80px;
-  margin-top: -55px;
-  opacity: 0;
-  animation: move-and-fade-15 2.5s linear infinite;
-  animation-delay: 3.4s;
-}
-
-.stream:before {
-  position: absolute;
-  content: "~";
-  font-size: 70px;
-}
-
-.stream:first-child {
-  margin-left: 20px;
-  margin-top: -70px;
-  animation: move-and-fade-10 2.5s linear infinite;
-  animation-delay: 3.2s;
-}
-
-.stream:last-child {
-  margin-left: 40px;
-  animation: move-and-fade-20 2.5s linear infinite;
-  animation-delay: 3s;
-}
-
-.flake {
-  position: absolute;
-  margin-top: -55px;
-  margin-left: 125px;
-  opacity: 0;
-  animation: move-and-fade-15 2.5s linear infinite;
-  animation-delay: 3.4s;
-}
-
-.flake:before {
-  content: "*";
-  position: absolute;
-  color: white;
-  height: 80px;
-  width: 80px;
-  margin-top: 0px;
-  font-size: 70px;
-}
-
-.flake:first-child {
-  margin-left: 90px;
-  margin-top: -70px;
-  animation: move-and-fade-10 2.5s linear infinite;
-  animation-delay: 3.2s;
-}
-
-.flake:last-child {
-  margin-left: 50px;
-  margin-top: -45px;
-  animation: move-and-fade-20 2.5s linear infinite;
-  animation-delay: 3s;
-}
+setupBaseListeners();
