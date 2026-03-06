@@ -1,16 +1,12 @@
-/* =========================
-   Pouring layers
-   ========================= */
-
+/* -------------------------
+   Animations for pouring layers
+   ------------------------- */
 @keyframes pour-layer {
-  0% {
-    transform: translateY(400%);
-  }
-  100% {
-    transform: translateY(0%);
-  }
+  0% { transform: translateY(400%); }
+  100% { transform: translateY(0%); }
 }
 
+/* Base beverage layer (tea/coffee) */
 .base {
   position: relative;
   background-color: #361713;
@@ -18,35 +14,32 @@
   height: 50%;
   bottom: 0;
   animation: pour-layer 2s forwards;
-  z-index: 1;
+  z-index: 300;
 }
 
-// TODO:
-// 1. Create a mixin named `syrup-layer`.
-// 2. The mixin should take one parameter: $color.
-// 3. Replace the hard-coded color (#ffefd5) in the gradient with $color.
-// 4. Use @include syrup-layer(...) inside .syrup.
-
+/* Mixin for syrup stripes */
 @mixin syrup-layer($color) {
   background: repeating-linear-gradient(
     45deg,
     white,
     white 10px,
-    var(--syrup-color, $color) 10px,
-    var(--syrup-color, $color) 20px
+    $color 10px,
+    $color 20px
   );
 }
 
+/* Syrup layer using mixin and CSS variable */
 .syrup {
+  @include syrup-layer(var(--syrup-color, #ffefd5));
   position: relative;
   transform: translateY(400%);
-  @include syrup-layer(#ffefd5);
   width: 100%;
   height: 20%;
   animation: pour-layer 2s 1s forwards;
   z-index: 2;
 }
 
+/* Froth/foam layer */
 .froth {
   overflow: visible;
   position: relative;
@@ -55,13 +48,9 @@
   width: 100%;
   background-color: #c6c6c6;
   animation: pour-layer 2s 2s forwards;
-  z-index: 3;
 }
 
-/* =========================
-   Foam bubbles
-   ========================= */
-
+/* Individual foam bubbles */
 .foam {
   display: block;
   background: #e4e0d2;
@@ -71,31 +60,14 @@
   position: absolute;
 }
 
-.foam:nth-child(1) { top: 0px; left: -3px; }
-.foam:nth-child(2) { top: 0px; left: 55px; }
-
-.foam:nth-child(3) {
-  width: 30px;
-  height: 30px;
-  border-radius: 40px;
-  top: 3px;
-  left: 30px;
-}
-
-.foam:nth-child(4) {
-  width: 30px;
-  height: 30px;
-  border-radius: 45px;
-  top: 5px;
-  right: -2px;
-}
-
+/* Foam positions */
+.foam:nth-child(1) { top: 0; left: -3px; }
+.foam:nth-child(2) { top: 0; left: 55px; }
+.foam:nth-child(3) { width: 30px; height: 30px; border-radius: 40px; top: 3px; left: 30px; }
+.foam:nth-child(4) { width: 30px; height: 30px; border-radius: 45px; top: 5px; right: -2px; }
 .foam:nth-child(5) { top: 2px; right: 10px; }
 
-/* =========================
-   Mug / carafe
-   ========================= */
-
+/* Mug and carafe structure */
 .mug {
   width: 8em;
   height: 6em;
@@ -124,4 +96,109 @@
   width: 100%;
   height: 100%;
   transition: all 1s;
+}
+
+/* -------------------------
+   Steam / snowfall animations
+   ------------------------- */
+@keyframes move-and-fade-10 {
+  0% { opacity: 0; transform: translateY(0) rotate(90deg); }
+  50% { opacity: 0.5; }
+  75% { opacity: 0; }
+  100% { transform: translateY(-10px) rotate(90deg); opacity: 0; }
+}
+@keyframes move-and-fade-15 {
+  0% { opacity: 0; transform: translateY(0) rotate(90deg); }
+  50% { opacity: 0.5; }
+  75% { opacity: 0; }
+  100% { transform: translateY(-15px) rotate(90deg); opacity: 0; }
+}
+@keyframes move-and-fade-20 {
+  0% { opacity: 0; transform: translateY(0) rotate(90deg); }
+  50% { opacity: 0.5; }
+  75% { opacity: 0; }
+  100% { transform: translateY(-20px) rotate(90deg); opacity: 0; }
+}
+
+/* Steam streams */
+.stream, .flake {
+  position: absolute;
+  opacity: 0;
+  animation: move-and-fade-15 2.5s linear infinite;
+  animation-delay: 3.4s;
+}
+
+/* Stream specific adjustments */
+.stream { transform: rotate(90deg); height: 80px; width: 80px; margin-top: -55px; }
+.stream:before { content: "~"; font-size: 70px; position: absolute; }
+.stream:first-child { margin-left: 20px; margin-top: -70px; animation: move-and-fade-10 2.5s linear infinite; animation-delay: 3.2s; }
+.stream:last-child { margin-left: 40px; animation: move-and-fade-20 2.5s linear infinite; animation-delay: 3s; }
+
+/* Snowflake effects */
+.flake { margin-top: -55px; margin-left: 125px; }
+.flake:before { content: "*"; position: absolute; color: white; font-size: 70px; height: 80px; width: 80px; }
+.flake:first-child { margin-left: 90px; margin-top: -70px; animation: move-and-fade-10 2.5s linear infinite; animation-delay: 3.2s; }
+.flake:last-child { margin-left: 50px; margin-top: -45px; animation: move-and-fade-20 2.5s linear infinite; animation-delay: 3s; }
+
+/* -------------------------
+   Page / app base styles
+   ------------------------- */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #6e4228 0%, #956f5a 100%);
+}
+
+#app { max-width: 1280px; margin: 0 auto; padding: 2rem; text-align: center; }
+.card { padding: 2em; }
+ul { list-style: none; padding-left: 0; }
+
+/* Layout for option rows */
+.row-top { display: flex; justify-content: space-evenly; align-items: center; margin: 0 auto 0.75rem; }
+.row-top .choice, .row-aligned .choice { display: inline-flex; align-items: center; gap: 0.35rem; }
+.row-aligned .choices { display: grid; grid-template-columns: repeat(3, 8rem); justify-content: center; gap: 0.5rem; }
+
+/* Links and headers */
+a { font-weight: 500; color: #646cff; text-decoration: inherit; }
+a:hover { color: #535bf2; }
+h1 { font-size: 3.2em; line-height: 1.1; }
+
+/* Buttons */
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover { border-color: #646cff; }
+button:focus, button:focus-visible { outline: 4px auto -webkit-focus-ring-color; }
+
+/* Light mode overrides */
+@media (prefers-color-scheme: light) {
+  :root { color: #213547; background-color: #ffffff; }
+  a:hover { color: #747bff; }
+  button { background-color: #f9f9f9; }
 }
