@@ -1,4 +1,4 @@
-import "./style.scss"
+import "./style.scss";
 
 const bases: Record<string, string> = {
   blackTea: "#8B4513",
@@ -18,92 +18,56 @@ const syrups: Record<string, string> = {
   hazelnut: "#6B4423",
 };
 
-function applyTemperature(input: HTMLInputElement): void {
-  const container = document.getElementById("condensation") as HTMLDivElement | null;
+function applyTemperature(input: HTMLInputElement) {
+  const container = document.getElementById("condensation");
   if (!container) return;
 
-  const children = container.children;
-
-  for (let i = 0; i < children.length; i++) {
-    const child = children[i] as HTMLElement;
-
-    if (input.value === "hot") {
-      child.className = "stream";
-    } else {
-      child.className = "flake";
-    }
-  }
+  Array.from(container.children).forEach((child) => {
+    (child as HTMLElement).className = input.value === "hot" ? "stream" : "flake";
+  });
 }
 
-function applyBase(input: HTMLInputElement): void {
-  const baseElements = document.getElementsByClassName("base");
-  if (baseElements.length === 0) return;
+function applyBase(input: HTMLInputElement) {
+  const baseDiv = document.querySelector<HTMLDivElement>(".base");
+  if (!baseDiv) return;
 
-  const baseDiv = baseElements[0] as HTMLDivElement;
   const color = bases[input.value];
-  if (!color) return;
-
-  baseDiv.style.backgroundColor = color;
+  if (color) baseDiv.style.backgroundColor = color;
 }
 
-function applyCream(input: HTMLInputElement): void {
-  const creamElements = document.getElementsByClassName("foam");
-  if (creamElements.length === 0) return;
-
+function applyCream(input: HTMLInputElement) {
+  const creamElements = document.querySelectorAll<HTMLDivElement>(".foam");
   const color = creamers[input.value];
   if (!color) return;
 
-  for (let i = 0; i < creamElements.length; i++) {
-    const element = creamElements[i] as HTMLDivElement;
+  creamElements.forEach((element) => {
     element.style.backgroundColor = color;
-  }
+  });
 }
 
-function applySyrup(input: HTMLInputElement): void {
-  const syrupElements = document.getElementsByClassName("syrup");
-  if (syrupElements.length === 0) return;
+function applySyrup(input: HTMLInputElement) {
+  const syrupDiv = document.querySelector<HTMLDivElement>(".syrup");
+  if (!syrupDiv) return;
 
-  const syrupDiv = syrupElements[0] as HTMLDivElement;
   const color = syrups[input.value];
-  if (!color) return;
-
-  syrupDiv.style.background = `repeating-linear-gradient(
-    45deg,
-    white,
-    white 10px,
-    ${color} 10px,
-    ${color} 20px
-  )`;
+  if (color) syrupDiv.style.setProperty("--syrup-color", color);
 }
 
-function setupSyrupListeners(): void {
-  const inputs = document.querySelectorAll<HTMLInputElement>('input[name="syrup"]');
+function setupListeners<T extends HTMLInputElement>(
+  name: string,
+  applyFn: (input: T) => void
+) {
+  const inputs = document.querySelectorAll<T>(`input[name="${name}"]`);
+
   inputs.forEach((input) => {
-    input.addEventListener("change", () => applySyrup(input));
+    input.addEventListener("change", () => applyFn(input));
   });
-}
-setupSyrupListeners();
 
-function setupCreamListeners(): void {
-  const inputs = document.querySelectorAll<HTMLInputElement>('input[name="cream"]');
-  inputs.forEach((input) => {
-    input.addEventListener("change", () => applyCream(input));
-  });
+  const checked = document.querySelector<T>(`input[name="${name}"]:checked`);
+  if (checked) applyFn(checked);
 }
-setupCreamListeners();
 
-function setupTemperatureListeners(): void {
-  const inputs = document.querySelectorAll<HTMLInputElement>('input[name="temperature"]');
-  inputs.forEach((input) => {
-    input.addEventListener("change", () => applyTemperature(input));
-  });
-}
-setupTemperatureListeners();
-
-function setupBaseListeners(): void {
-  const inputs = document.querySelectorAll<HTMLInputElement>('input[name="base"]');
-  inputs.forEach((input) => {
-    input.addEventListener("change", () => applyBase(input));
-  });
-}
-setupBaseListeners();
+setupListeners("temperature", applyTemperature);
+setupListeners("base", applyBase);
+setupListeners("cream", applyCream);
+setupListeners("syrup", applySyrup);
